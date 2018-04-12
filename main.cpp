@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <QImageReader>
+#include <QDir>
 
 #include "gif.h"
 
@@ -16,7 +17,12 @@ int main(int argc, char *argv[])
 
     string gifPath = argv[1];
 
-    QImageReader qImageReader( gifPath.c_str() );
+    QImageReader qImageReader( QDir::currentPath() + "/" + QString(gifPath.c_str()) );
+
+    cout << "Input gif have " << qImageReader.imageCount() << " frames" << endl;
+    qImageReader.jumpToImage(0);
+    cout << "Frame resolution: " <<  qImageReader.read().width() << " x "<< qImageReader.read().height() << endl;
+
     vector<QImage> animatedGif;
 
     if( qImageReader.supportsAnimation() && ( qImageReader.imageCount() > 1 ) )
@@ -30,6 +36,5 @@ int main(int argc, char *argv[])
 
     //GifBegin()
 
-    cout << gifPath << endl;
     return 0;
 }
