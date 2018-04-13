@@ -1,9 +1,7 @@
 #include <iostream>
 
-#include <QImageReader>
-#include <QDir>
-
-#include "gif.h"
+#include "GifLoader.h"
+#include "VideoDecoder.h"
 
 using namespace std;
 
@@ -15,26 +13,13 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    string gifPath = argv[1];
+    string filePath = argv[1];
 
-    QImageReader qImageReader( QDir::currentPath() + "/" + QString(gifPath.c_str()) );
+    // Load animated GIF
+    GifLoader::loadGif(filePath);
 
-    cout << "Input gif have " << qImageReader.imageCount() << " frames" << endl;
-    qImageReader.jumpToImage(0);
-    cout << "Frame resolution: " <<  qImageReader.read().width() << " x "<< qImageReader.read().height() << endl;
-
-    vector<QImage> animatedGif;
-
-    if( qImageReader.supportsAnimation() && ( qImageReader.imageCount() > 1 ) )
-    {
-        for( int i = 0; i < qImageReader.imageCount(); i++ )
-        {
-            qImageReader.jumpToImage( i );
-            animatedGif.push_back( qImageReader.read() );
-        }
-    }
-
-    //GifBegin()
+    // Decode video
+    VideoDecoder::decodeVideo(filePath);
 
     return 0;
 }

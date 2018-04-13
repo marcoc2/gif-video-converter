@@ -2,7 +2,13 @@ QT       += core
 TEMPLATE = app
 CONFIG += console c++11
 
-SOURCES += main.cpp
+LIBS += -lavcodec
+
+SOURCES += main.cpp \
+    GifLoader.cpp \
+    VideoDecoder.cpp
 
 HEADERS += \
-    gif.h
+    gif.h \
+    GifLoader.h \
+    VideoDecoder.h
