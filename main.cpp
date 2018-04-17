@@ -9,17 +9,24 @@ int main(int argc, char *argv[])
 {
     if(argc != 2)
     {
-        cout << "USAGE: $ program file.gif" << endl;
+        cout << "USAGE: $ program [OPTIONS] file.gif" << endl;
         return 0;
     }
 
-    string filePath = argv[1];
+    string direction = argv[1];
+    string filePath = argv[2];
 
-    // Load animated GIF
-    GifLoader::loadGif(filePath);
+    int isG2V = direction.compare("g2v");
+    int isGIF2VID = direction.compare("gif2vid");
+    int isV2G = direction.compare("v2g");
+    int isVID2GIF = direction.compare("vid2gif");
 
-    // Decode video
-    VideoDecoder::decodeVideo(filePath);
+    if(isG2V == 0 || isGIF2VID == 0)
+        GifLoader::loadGif(filePath);
+    else if(isV2G == 0 || isVID2GIF)
+        VideoDecoder::decodeVideo(filePath);
+    else
+        return 1;
 
     return 0;
 }

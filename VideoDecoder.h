@@ -3,6 +3,10 @@
 
 #include <iostream>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+}
+
 class VideoDecoder
 {
 public:

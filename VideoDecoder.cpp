@@ -1,7 +1,17 @@
 #include "VideoDecoder.h"
-#include <libavcodec/avcodec.h>
 
 #define INBUF_SIZE 4096
+
+static AVPacket *av_packet_alloc(void)
+{
+    AVPacket *pkt = static_cast<AVPacket*>( av_mallocz(sizeof(AVPacket)) );
+    if (!pkt)
+        return pkt;
+
+    av_packet_unref(pkt);
+
+    return pkt;
+}
 
 VideoDecoder::VideoDecoder()
 {
