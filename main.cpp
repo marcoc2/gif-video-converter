@@ -1,7 +1,10 @@
 #include <iostream>
+#include <vector>
+#include <QImage>
 
 #include "GifLoader.h"
 #include "VideoDecoder.h"
+#include "VideoEncoder.h"
 
 using namespace std;
 
@@ -22,7 +25,10 @@ int main(int argc, char *argv[])
     int isVID2GIF = direction.compare("vid2gif");
 
     if(isG2V == 0 || isGIF2VID == 0)
-        GifLoader::loadGif(filePath);
+    {
+        auto frames = GifLoader::loadGif(filePath);
+        VideoEncoder::encodeVideo(frames);
+    }
     else if(isV2G == 0 || isVID2GIF)
         VideoDecoder::decodeVideo(filePath);
     else

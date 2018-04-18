@@ -8,7 +8,7 @@ GifLoader::GifLoader()
 
 }
 
-void GifLoader::loadGif(std::string filePath)
+std::vector<QImage> GifLoader::loadGif(std::string filePath)
 {
     QImageReader qImageReader( QDir::currentPath() + "/" + QString(filePath.c_str()) );
 
@@ -26,4 +26,6 @@ void GifLoader::loadGif(std::string filePath)
             animatedGif.push_back( qImageReader.read() );
         }
     }
+
+    return animatedGif;
 }
