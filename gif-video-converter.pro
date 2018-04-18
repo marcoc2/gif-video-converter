@@ -2,7 +2,8 @@ QT       += core
 TEMPLATE = app
 CONFIG += console c++14
 
-LIBS += -lavcodec -lavutil
+LIBS += -lavcodec -lavutil -lavformat
+LIBS += -lboost_program_options
 
 SOURCES += main.cpp \
     GifLoader.cpp \

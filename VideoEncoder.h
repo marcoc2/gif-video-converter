@@ -9,7 +9,7 @@ class VideoEncoder
 public:
     VideoEncoder();
 
-    static void encodeVideo(std::vector<QImage> frames);
+    static bool encodeVideo(std::vector<QImage> frames);
 };
 
 #endif // VIDEOENCODER_H

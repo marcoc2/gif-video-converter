@@ -37,14 +37,16 @@ void VideoDecoder::decodeVideo(std::string filePath)
     memset(inbuf + INBUF_SIZE, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
     /* find the MPEG-1 video decoder */
-    codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
-    if (!codec) {
+    codec = avcodec_find_decoder(AV_CODEC_ID_THEORA);
+    if(!codec)
+    {
         fprintf(stderr, "Codec not found\n");
         exit(1);
     }
 
     parser = av_parser_init(codec->id);
-    if (!parser) {
+    if(!parser)
+    {
         fprintf(stderr, "parser not found\n");
         exit(1);
     }

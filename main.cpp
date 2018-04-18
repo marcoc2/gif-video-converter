@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <QImage>
+#include <boost/program_options.hpp>
 
 #include "GifLoader.h"
 #include "VideoDecoder.h"
@@ -10,7 +11,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2)
+    if(argc < 3)
     {
         cout << "USAGE: $ program [OPTIONS] file.gif" << endl;
         return 0;
@@ -27,7 +28,8 @@ int main(int argc, char *argv[])
     if(isG2V == 0 || isGIF2VID == 0)
     {
         auto frames = GifLoader::loadGif(filePath);
-        VideoEncoder::encodeVideo(frames);
+        if(!VideoEncoder::encodeVideo(frames))
+            return 1;
     }
     else if(isV2G == 0 || isVID2GIF)
         VideoDecoder::decodeVideo(filePath);
