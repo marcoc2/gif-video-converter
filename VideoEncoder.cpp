@@ -50,8 +50,8 @@ static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt,
     //    exit(1);
     //}
 
-    while (ret >= 0)
-    {
+    //while (ret >= 0)
+    //{
         int got = 0;
         //ret = avcodec_receive_packet(enc_ctx, pkt); //DEPRECATED
         ret = avcodec_encode_video2(enc_ctx, pkt, frame, &got );
@@ -65,7 +65,7 @@ static void encode(AVCodecContext *enc_ctx, AVFrame *frame, AVPacket *pkt,
         printf("Write packet %3" PRId64 " (size=%5d)\n", pkt->pts, pkt->size);
         fwrite(pkt->data, 1, pkt->size, outfile);
         av_packet_unref(pkt);
-    }
+    //}
 }
 
 bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
@@ -75,7 +75,7 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
     av_register_all();
 
     const AVCodec* codec;
-    AVCodecContext* context = nullptr;;
+    AVCodecContext* context = nullptr;
     int i, ret, x, y;
 
     FILE* file;
@@ -105,8 +105,10 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
     context->bit_rate = 400000;
 
     // Resolution must be a multiple of two
-    context->width = 352;
-    context->height = 288;
+    //context->width = 352;
+    //context->height = 288;
+    context->width = image.width();
+    context->height = image.height();
 
     // Frames per second
     context->time_base = {1, 25};
@@ -122,7 +124,7 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
         return false;
     }
 
-    file = fopen("teste.jpg", "wb");
+    file = fopen("teste.mp4", "wb");
     if(!file)
     {
         fprintf(stderr, "could not open %s\n", "teste.jpg");
@@ -140,7 +142,7 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
     }
 
     // Encode 1 second of video
-    for(i=0; i<25 ;i++)
+    for(i=0; i<150 ;i++)
     {
         fflush(stdout);
         /* make sure the frame data is writable */
@@ -151,14 +153,15 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
         /* Y */
         for(y=0;y<context->height;y++) {
             for(x=0;x<context->width;x++) {
-                picture->data[0][y * picture->linesize[0] + x] = x + y + i * 3;
+                //picture->data[0][y * picture->linesize[0] + x] = x + y + i * 3;
+                picture->data[0][y * picture->linesize[0] + x] = qGray(image.pixel(x, y));
             }
         }
         /* Cb and Cr */
         for(y=0;y<context->height/2;y++) {
             for(x=0;x<context->width/2;x++) {
-                picture->data[1][y * picture->linesize[1] + x] = 128 + y + i * 2;
-                picture->data[2][y * picture->linesize[2] + x] = 64 + x + i * 5;
+                picture->data[1][y * picture->linesize[1] + x] = qRed(image.pixel(x, y));//128 + y + i * 2;
+                picture->data[2][y * picture->linesize[2] + x] = qGreen(image.pixel(x, y));//64 + x + i * 5;
             }
         }
         picture->pts = i;
