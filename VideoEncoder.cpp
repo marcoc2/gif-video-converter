@@ -1,4 +1,6 @@
 #include "VideoEncoder.h"
+#include "ImageUtils.h"
+#include <opencv2/imgproc/imgproc.hpp>
 
 extern "C"
 {
@@ -6,6 +8,7 @@ extern "C"
 #include "libavutil/common.h"
 #include "libavutil/imgutils.h"
 #include "libavformat/avformat.h"
+#include "libswscale/swscale.h"
 }
 
 // Source: http://www.ffmpeg.org/doxygen/3.0/avpacket_8c_source.html
@@ -141,33 +144,57 @@ bool VideoEncoder::encodeVideo(std::vector<QImage> frames)
         return false;
     }
 
-    // Encode 1 second of video
+    cv::Mat frame = QImageToCvMat(image);
+    cv::cvtColor(frame, frame, cv::COLOR_RGB2YCrCb);
+
+    // initialize sample scaler
+    SwsContext* swsctx = sws_getCachedContext(nullptr,
+                                              image.width(), image.height(),
+                                              AV_PIX_FMT_BGR24,
+                                              image.width(), image.height(),
+                                              context->pix_fmt, SWS_BICUBIC,
+                                              nullptr, nullptr, nullptr);
+    if (!swsctx) {
+        std::cerr << "fail to sws_getCachedContext";
+        return 2;
+    }
+
     for(i=0; i<150 ;i++)
     {
-        fflush(stdout);
-        /* make sure the frame data is writable */
-        ret = av_frame_make_writable(picture);
-        if(ret < 0)
-            return false;
-        /* prepare a dummy image */
-        /* Y */
-        for(y=0;y<context->height;y++) {
-            for(x=0;x<context->width;x++) {
-                //picture->data[0][y * picture->linesize[0] + x] = x + y + i * 3;
-                picture->data[0][y * picture->linesize[0] + x] = qGray(image.pixel(x, y));
-            }
-        }
-        /* Cb and Cr */
-        for(y=0;y<context->height/2;y++) {
-            for(x=0;x<context->width/2;x++) {
-                picture->data[1][y * picture->linesize[1] + x] = qRed(image.pixel(x, y));//128 + y + i * 2;
-                picture->data[2][y * picture->linesize[2] + x] = qGreen(image.pixel(x, y));//64 + x + i * 5;
-            }
-        }
+        const int stride[] = { static_cast<int>(frame.step[0]) };
+        sws_scale(swsctx, &frame.data, stride, 0, frame.rows, picture->data, picture->linesize);
         picture->pts = i;
         /* encode the image */
         encode(context, picture, pkt, file);
     }
+
+
+    // Encode 1 second of video
+    //for(i=0; i<150 ;i++)
+    //{
+    //    fflush(stdout);
+    //    /* make sure the frame data is writable */
+    //    ret = av_frame_make_writable(picture);
+    //    if(ret < 0)
+    //        return false;
+    //    /* prepare a dummy image */
+    //    /* Y */
+    //    for(y=0;y<context->height;y++) {
+    //        for(x=0;x<context->width;x++) {
+    //            picture->data[0][y * picture->linesize[0] + x] = x + y + i * 3;
+    //        }
+    //    }
+    //    /* Cb and Cr */
+    //    for(y=0;y<context->height/2;y++) {
+    //        for(x=0;x<context->width/2;x++) {
+    //            picture->data[1][y * picture->linesize[1] + x] = 128 + y + i * 2;
+    //            picture->data[2][y * picture->linesize[2] + x] = 64 + x + i * 5;
+    //        }
+    //    }
+    //    picture->pts = i;
+    //    /* encode the image */
+    //    encode(context, picture, pkt, file);
+    //}
 
     /* flush the encoder */
     encode(context, NULL, pkt, file);
